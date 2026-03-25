@@ -35,7 +35,7 @@ By the end of this lab, you should be able to:
 1. Navigate to:
 
    ```
-   https://www.wireshark.org/resources#sample-captures
+   https://wiki.wireshark.org/samplecaptures
    ```
 
 2. Download a capture file containing web traffic
