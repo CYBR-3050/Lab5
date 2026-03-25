@@ -6,7 +6,7 @@
 
 Modern network security revolves around understanding how attackers **observe**, **enumerate**, and **interact** with systems.
 
-In this lab, you will explore three key concepts from Chapter 6:
+In this lab, you will explore three key concepts:
 
 * **Interception** – observing data in transit (confidentiality risk) 
 * **Reconnaissance** – identifying exposed services (attack surface) 
@@ -39,7 +39,7 @@ By the end of this lab, you should be able to:
    ```
 
 2. Download a capture file containing web traffic
-   *(Recommended: HTTP or mixed traffic captures such as “http.cap” or similar)*
+   *(Recommended: HTTP or mixed traffic captures such as “dns.cap” or similar)*
 
 3. Open the file in **Wireshark**
 
@@ -75,6 +75,38 @@ Look for:
 * URLs and parameters
 * Session identifiers
 * Any readable data in plaintext
+
+## Step 4: Run a Wireshark Scan
+You will run a live scan on wireshark. Click the blue "fin" in the top-left corner of Wireshark.
+
+* Open a web browser in Kali
+* Navigate to a site you have not been to before (on that browser)
+* Stop Scan
+
+Can you find the DNS request for your site?
+
+## Step 5: Update your DNS Server
+* Open terminal.
+* Edit the file: 
+```bash
+sudo nano /etc/resolv.conf
+```
+Replace or add lines:
+```bash
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+```
+Save and exit (Ctrl+O, Enter, Ctrl+X). 
+
+This is a temporary change and will revert when you restart your VM.
+
+## Step 6: Repeat the Wireshark Scan
+With the new DNS servers, repeat the wireshark scan.
+* Begin new wireshark scan
+* Navigate to a new website
+* Stop the capture
+
+Could you find the new DNS request?
 
 ---
 
@@ -123,6 +155,36 @@ Identify:
 * Services running
 * Version information (if available)
 
+## Step 4: Open Telnet
+Telnet is a vulnerable service and should not be used generally. It is also a great tool for accessing remote services and is often used in malicious attacks. Spotting an open telnet connection on your network may be an indication of an attack.
+
+```bash
+sudo apt update
+sudo apt install telnetd inetutils-inetd
+sudo update-inetd --enable telnet
+```
+
+Verify that Telnet is open:
+```bash
+netstat -nltp | grep 23
+```
+
+Connect via telnet (this is silly since we are connecting to ourselves from our own computer...)
+```bash
+telnet localhost
+```
+Enter your username and password. 
+
+After you see that you are indeed in a terminal, you can exit back to the command terminal (I know - it is redundant)
+```bash
+exit
+```
+
+## Step 5: Scan system again
+```bash
+nmap localhost
+```
+
 ---
 
 ## Reflection Questions
@@ -137,10 +199,12 @@ Identify:
 
 ## Step 1: Apply a Basic Firewall Rule
 
-Block access to your web server port:
+Block access to your telnet port and local server:
 
 ```bash
+sudo apt install ufw -y
 sudo ufw enable
+sudo ufw deny 23
 sudo ufw deny 8000
 ```
 
@@ -150,14 +214,14 @@ sudo ufw deny 8000
 
 * Try accessing:
 
-  ```
-  http://localhost:8000
-  ```
+```
+http://localhost:8000
+```
 * Run another scan:
 
-  ```bash
-  nmap localhost
-  ```
+```bash
+nmap localhost
+```
 
 ---
 
